@@ -734,6 +734,18 @@ namespace xsimd
             return res;
         }
 
+        template <class A, typename T>
+        XSIMD_INLINE typename std::enable_if<std::is_arithmetic<T>::value, batch<T, A>>::type
+        swizzle(batch<T, A> const& self, batch<T, A> const& mask, requires_arch<emulated<8 * sizeof(T) * batch<T, A>::size>>) noexcept
+        {
+            constexpr size_t size = batch<T, A>::size;
+            batch<ITy, A> bmask = mask;
+            std::array<T, size> res;
+            for (size_t i = 0; i < size; ++i)
+                res[i] = self.data[bmask.data[i]];
+            return res;
+        }
+
         // zip_hi
         template <class A, class T, size_t N = 8 * sizeof(T) * batch<T, A>::size>
         XSIMD_INLINE batch<T, A> zip_hi(batch<T, A> const& self, batch<T, A> const& other, requires_arch<emulated<N>>) noexcept
